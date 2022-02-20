@@ -25,6 +25,12 @@ const TS_CONFIG = {
   ]
 }
 
+// Base configuration for Typedoc.
+const TYPEDOC_CONFIG = {
+  "out": null,
+  "entryPoints": []
+}
+
 /**
  * A logger function.
  * @param args
@@ -108,13 +114,25 @@ function saveJson(filePath, json) {
 /**
  * Create configuration for typescript.
  */
-function makeTsConfig() {
+ function makeTsConfig() {
   let include = []
   Object.keys(config.repositories).forEach(name => {
     include = include.concat(config.repositories[name].include.map(i => `${name}/${i}`))
   })
   const tsConf = {...TS_CONFIG, include}
   saveJson('tsconfig.json', tsConf)
+}
+
+/**
+ * Create configuration for typedoc.
+ */
+ function makeTypedocConfig() {
+  let entryPoints = []
+  Object.keys(config.repositories).forEach(name => {
+    entryPoints = entryPoints.concat(config.repositories[name].include.map(i => `${name}/${i}`))
+  })
+  const typedocConf = {...TYPEDOC_CONFIG, entryPoints, out: config.outDir}
+  saveJson('typedoc.json', typedocConf)
 }
 
 /**
@@ -125,7 +143,7 @@ async function compile() {
   Object.keys(config.repositories).forEach(name => {
     include = include.concat(config.repositories[name].include.map(i => `${name}/${i}`))
   })
-  await system(`cd "${config.buildDir}" && npx typedoc --out "${config.outDir}" ${include.join(' ')}`)
+  await system(`cd "${config.buildDir}" && npx typedoc`)
 }
 
 /**
@@ -136,6 +154,7 @@ async function buildAll() {
     await fetch(name)
   }
   makeTsConfig()
+  makeTypedocConfig()
   await compile()
 }
 
