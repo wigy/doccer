@@ -8,6 +8,23 @@ import { spawn } from 'child_process'
 // Currently used configuration.
 let config
 
+// Base configuration for Typescript.
+const TS_CONFIG = {
+  "compilerOptions": {
+      "target": "es2020",
+      "module": "commonjs",
+      "esModuleInterop": true,
+      "strictNullChecks": true,
+      "moduleResolution": "node",
+      "declaration": true,
+      "skipLibCheck": true,
+      "outDir": "./dist",
+      "sourceMap": true
+  },
+  "include": [
+  ]
+}
+
 /**
  * A logger function.
  * @param args
@@ -78,18 +95,57 @@ async function fetch(name) {
 }
 
 /**
+ * Save a json config file.
+ * @param filePath
+ * @param json
+ */
+function saveJson(filePath, json) {
+  const jsonPath = path.join(config.buildDir, filePath)
+  log('Saving', jsonPath)
+  fs.writeFileSync(jsonPath, JSON.stringify(json, null, 2))
+}
+
+/**
+ * Create configuration for typescript.
+ */
+function makeTsConfig() {
+  let include = []
+  Object.keys(config.repositories).forEach(name => {
+    include = include.concat(config.repositories[name].include.map(i => `${name}/${i}`))
+  })
+  const tsConf = {...TS_CONFIG, include}
+  saveJson('tsconfig.json', tsConf)
+}
+
+/**
+ * Run document build command.
+ */
+async function compile() {
+  let include = []
+  Object.keys(config.repositories).forEach(name => {
+    include = include.concat(config.repositories[name].include.map(i => `${name}/${i}`))
+  })
+  await system(`cd "${config.buildDir}" && npx typedoc --out "${config.outDir}" ${include.join(' ')}`)
+}
+
+/**
  * Rebuild documentation.
  */
 async function buildAll() {
   for (const name of Object.keys(config.repositories)) {
     await fetch(name)
   }
+  makeTsConfig()
+  await compile()
 }
 
 async function main() {
   config = readConfig(process.cwd())
   if (!config.buildDir) {
     config.buildDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'build')
+  }
+  if (!config.outdDir) {
+    config.outDir = path.join(config.buildDir, 'output')
   }
   await buildAll()
 }
