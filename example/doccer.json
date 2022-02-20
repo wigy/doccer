@@ -1,10 +1,10 @@
 {
   "title": "Example Doccer Project",
   "repositories": {
-    "Interactive Elements": {
+    "interactive-elements": {
       "git": "git@github.com:wigy/interactive-elements.git"
     },
-    "Interactive Stateful Process": {
+    "interactive-stateful-process": {
       "git": "git@github.com:wigy/interactive-stateful-process.git"
     }
   }
