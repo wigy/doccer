@@ -1,0 +1,14 @@
+{
+  "name": "doccer",
+  "version": "1.0.0",
+  "main": "bin/doccer.mjs",
+  "repository": "git@github.com:wigy/doccer.git",
+  "author": "Tommi Ronkainen <tommi.ronkainen@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "demo": "cd example && ../bin/doccer.mjs"
+  },
+  "dependencies": {
+    "deepmerge": "^4.2.2"
+  }
+}
