@@ -36,6 +36,7 @@ const TYPEDOC_CONFIG = {
   "out": null,
   "entryPoints": [],
   "readme": null,
+  "name": null,
 }
 
 /**
@@ -156,6 +157,7 @@ function saveJson(filePath, json) {
   if (readmes.length) {
     typedocConf.readme = readmes.pop()
   }
+  typedocConf.name = config.title || 'No Title'
   saveJson('typedoc.json', typedocConf)
 }
 
