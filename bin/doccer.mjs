@@ -77,7 +77,7 @@ function readConfig(dir) {
   }
   conf.workDir = dir
   conf.buildDir = path.join(path.dirname(confPaths.pop()), 'build')
-  conf.outDir = path.join(conf.buildDir, 'output')
+  conf.outDir = path.join(conf.buildDir, 'html')
   if (!fs.existsSync(conf.outDir)) {
     fs.mkdirSync(conf.outDir, { recursive: true })
   }
