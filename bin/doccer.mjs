@@ -40,18 +40,30 @@ function log(...args) {
 }
 
 /**
+ * Collect all file paths matching the file name found, when ascending in the directory structure.
+ * @param startDir
+ * @param fileName
+ */
+function pathsFound(startDir, fileName) {
+  const filePath = path.join(startDir, fileName)
+  let result = []
+  if (fs.existsSync(filePath)) {
+    result.push(filePath)
+  }
+  const parentDir = path.dirname(startDir)
+  if (parentDir !== startDir) {
+    result = result.concat(pathsFound(parentDir, fileName))
+  }
+  return result.reverse()
+}
+
+/**
  * Read the configuration for the project.
  */
 function readConfig(dir) {
-  const confPath = path.join(dir, 'doccer.json')
   let conf = {}
-  if (fs.existsSync(confPath)) {
-    conf = JSON.parse(fs.readFileSync(confPath).toString('utf-8'))
-  }
-  const parentDir = path.dirname(dir)
-  if (parentDir !== dir) {
-    const parentConf = readConfig(parentDir)
-    conf = deepmerge(parentConf, conf)
+  for (const confPath of pathsFound(dir, 'doccer.json')) {
+    conf = deepmerge(conf, JSON.parse(fs.readFileSync(confPath).toString('utf-8')))
   }
   return conf
 }
@@ -158,6 +170,9 @@ async function buildAll() {
   await compile()
 }
 
+/**
+ * Main program.
+ */
 async function main() {
   config = readConfig(process.cwd())
   if (!config.buildDir) {
