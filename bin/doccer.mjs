@@ -71,10 +71,16 @@ function pathsFound(startDir, fileName) {
  */
 function readConfig(dir) {
   let conf = {}
-  for (const confPath of pathsFound(dir, 'doccer.json')) {
+  const confPaths = pathsFound(dir, 'doccer.json')
+  for (const confPath of confPaths) {
     conf = deepmerge(conf, JSON.parse(fs.readFileSync(confPath).toString('utf-8')))
   }
   conf.workDir = dir
+  conf.buildDir = path.join(path.dirname(confPaths.pop()), 'build')
+  conf.outDir = path.join(conf.buildDir, 'output')
+  if (!fs.existsSync(conf.outDir)) {
+    fs.mkdirSync(conf.outDir, { recursive: true })
+  }
   return conf
 }
 
@@ -190,12 +196,6 @@ async function buildAll() {
  */
 async function main() {
   config = readConfig(process.cwd())
-  if (!config.buildDir) {
-    config.buildDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'build')
-  }
-  if (!config.outdDir) {
-    config.outDir = path.join(config.buildDir, 'output')
-  }
   log('Configuration')
   console.dir(config, { depth: null })
   await buildAll()
