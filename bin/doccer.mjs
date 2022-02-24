@@ -25,6 +25,7 @@ const TS_CONFIG = {
       "declaration": true,
       "skipLibCheck": true,
       "outDir": "./dist",
+      "jsx": "react",
       "sourceMap": true
   },
   "include": [
