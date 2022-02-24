@@ -6,7 +6,13 @@ import { fileURLToPath } from 'url'
 import { spawn } from 'child_process'
 
 // Currently used configuration.
-let config
+let config = {
+  workDir: null,
+  buildDir: null,
+  outDir: null,
+  title: '',
+  repositories: {},
+}
 
 // Base configuration for Typescript.
 const TS_CONFIG = {
@@ -28,7 +34,8 @@ const TS_CONFIG = {
 // Base configuration for Typedoc.
 const TYPEDOC_CONFIG = {
   "out": null,
-  "entryPoints": []
+  "entryPoints": [],
+  "readme": null,
 }
 
 /**
@@ -65,6 +72,7 @@ function readConfig(dir) {
   for (const confPath of pathsFound(dir, 'doccer.json')) {
     conf = deepmerge(conf, JSON.parse(fs.readFileSync(confPath).toString('utf-8')))
   }
+  conf.workDir = dir
   return conf
 }
 
@@ -144,6 +152,10 @@ function saveJson(filePath, json) {
     entryPoints = entryPoints.concat(config.repositories[name].include.map(i => `${name}/${i}`))
   })
   const typedocConf = {...TYPEDOC_CONFIG, entryPoints, out: config.outDir}
+  const readmes = pathsFound(config.workDir, 'DOCCER-INDEX.md')
+  if (readmes.length) {
+    typedocConf.readme = readmes.pop()
+  }
   saveJson('typedoc.json', typedocConf)
 }
 
@@ -181,6 +193,8 @@ async function main() {
   if (!config.outdDir) {
     config.outDir = path.join(config.buildDir, 'output')
   }
+  log('Configuration')
+  console.dir(config, { depth: null })
   await buildAll()
 }
 
