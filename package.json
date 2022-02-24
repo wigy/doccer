@@ -5,6 +5,9 @@
   "repository": "git@github.com:wigy/doccer.git",
   "author": "Tommi Ronkainen <tommi.ronkainen@gmail.com>",
   "license": "MIT",
+  "bin": {
+    "doccer": "bin/doccer.mjs"
+  },
   "scripts": {
     "demo": "cd example && ../bin/doccer.mjs"
   },
