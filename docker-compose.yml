@@ -6,5 +6,7 @@ services:
     build:
       context: .
       args:
-        DOCCER_TITLE: Example Doccer Project
+        DOCCER_TITLE: Example Doccer Project on Docker
         DOCCER_REPOS: https://github.com/wigy/interactive-elements.git
+    ports:
+      - 3303:3303

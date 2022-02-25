@@ -7,6 +7,7 @@ RUN apk add thttpd
 RUN apk add git
 RUN apk add nano
 RUN apk add openssh-client
+RUN apk add lighttpd
 
 # Create a non-root user to own the files and run our server
 RUN adduser -D static
@@ -25,4 +26,8 @@ RUN yarn install
 RUN /home/static/bin/env-2-config.mjs /home/static/doccer.json
 RUN /home/static/bin/doccer.mjs
 
-USER static
+COPY lighttpd.conf /home/static
+RUN mkdir -p /var/cache/lighttpd/compress/
+RUN mkdir -p /var/log/lighttpd/
+RUN chown static.static /var/log/lighttpd/ /var/cache/lighttpd/compress/
+CMD ["/usr/sbin/lighttpd", "-D", "-f", "./lighttpd.conf"]
