@@ -5,6 +5,6 @@ services:
     container_name: doccer-example
     build:
       context: .
-    environment:
-      DOCCER_TITLE: Example Doccer Project
-      DOCCER_REPOS: git@github.com:wigy/interactive-elements.git git@github.com:wigy/interactive-stateful-process.git
+      args:
+        DOCCER_TITLE: Example Doccer Project
+        DOCCER_REPOS: https://github.com/wigy/interactive-elements.git
