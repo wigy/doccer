@@ -72,8 +72,14 @@ function pathsFound(startDir, fileName) {
 function readConfig(dir) {
   let conf = {}
   const confPaths = pathsFound(dir, 'doccer.json')
+  if (confPaths.length === 0) {
+    throw new Error(`Unable to find configuration 'doccer.json'.`)
+  }
   for (const confPath of confPaths) {
     conf = deepmerge(conf, JSON.parse(fs.readFileSync(confPath).toString('utf-8')))
+  }
+  if (!conf.entries || !conf.entries.length) {
+    throw new Error(`No documentation entries defined in any of '${confPaths.join("', '")}'.`)
   }
   conf.workDir = dir
   conf.buildDir = path.join(path.dirname(confPaths.pop()), 'build')
@@ -142,7 +148,7 @@ function saveJson(filePath, json) {
 /**
  * Create configuration for typescript.
  */
- function makeTsConfig() {
+ function makeTsConfig() {
   let include = []
   Object.keys(config.repositories).forEach(name => {
     include = include.concat(config.repositories[name].include.map(i => `${name}/${i}`))
@@ -154,7 +160,7 @@ function saveJson(filePath, json) {
 /**
  * Create configuration for typedoc.
  */
- function makeTypedocConfig() {
+ function makeTypedocConfig() {
   let entryPoints = []
   Object.keys(config.repositories).forEach(name => {
     entryPoints = entryPoints.concat(config.repositories[name].include.map(i => `${name}/${i}`))
@@ -194,11 +200,11 @@ async function buildAll() {
 /**
  * Main program.
  */
-async function main() {
+async function main(...args) {
   config = readConfig(process.cwd())
   log('Configuration')
   console.dir(config, { depth: null })
   await buildAll()
 }
 
-await main()
+await main(process.argv.slice(2))
