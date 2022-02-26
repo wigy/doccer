@@ -2,8 +2,8 @@
 import path from 'path'
 import fs from 'fs'
 import deepmerge from 'deepmerge'
-import { fileURLToPath } from 'url'
 import { spawn } from 'child_process'
+import { ArgumentParser } from 'argparse'
 
 // Currently used configuration.
 let config = {
@@ -186,9 +186,19 @@ async function compile() {
 }
 
 /**
+ * Dump the configuration on console.
+ */
+function showConfig() {
+  log('Configuration')
+  console.dir(config, { depth: null })
+}
+
+/**
  * Rebuild documentation.
  */
 async function buildAll() {
+  readConfig(process.cwd())
+  showConfig()
   for (const name of Object.keys(config.repositories)) {
     await fetch(name)
   }
@@ -200,11 +210,17 @@ async function buildAll() {
 /**
  * Main program.
  */
-async function main(...args) {
-  config = readConfig(process.cwd())
-  log('Configuration')
-  console.dir(config, { depth: null })
-  await buildAll()
+async function main() {
+
+  const parser = new ArgumentParser({
+    description: 'Doccer CLI'
+  })
+  parser.add_argument('operation', { choices: ['build-all'] })
+  const args = parser.parse_args()
+  switch (args.operation) {
+    case 'build-all':
+      await buildAll()
+  }
 }
 
 await main(process.argv.slice(2))

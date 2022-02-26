@@ -24,7 +24,7 @@ COPY package.json /home/static
 RUN yarn install
 
 RUN /home/static/bin/env-2-config.mjs /home/static/doccer.json
-RUN /home/static/bin/doccer.mjs
+RUN /home/static/bin/doccer.mjs build-all
 
 COPY lighttpd.conf /home/static
 RUN mkdir -p /var/cache/lighttpd/compress/
