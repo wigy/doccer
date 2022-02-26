@@ -9,7 +9,8 @@
     "doccer": "bin/doccer.mjs"
   },
   "scripts": {
-    "demo": "cd example && ../bin/doccer.mjs build-all"
+    "demo": "cd example && ../bin/doccer.mjs build-all",
+    "demo:watch": "cd example && ../bin/doccer.mjs watch"
   },
   "dependencies": {
     "argparse": "^2.0.1",

@@ -17,16 +17,16 @@ let config = {
 // Base configuration for Typescript.
 const TS_CONFIG = {
   "compilerOptions": {
-      "target": "es2020",
-      "module": "commonjs",
-      "esModuleInterop": true,
-      "strictNullChecks": true,
-      "moduleResolution": "node",
-      "declaration": true,
-      "skipLibCheck": true,
-      "outDir": "./dist",
-      "jsx": "react",
-      "sourceMap": true
+    "target": "es2020",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "moduleResolution": "node",
+    "declaration": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "jsx": "react",
+    "sourceMap": true
   },
   "include": [
   ]
@@ -78,8 +78,8 @@ function readConfig(dir) {
   for (const confPath of confPaths) {
     conf = deepmerge(conf, JSON.parse(fs.readFileSync(confPath).toString('utf-8')))
   }
-  if (!conf.entries || !conf.entries.length) {
-    throw new Error(`No documentation entries defined in any of '${confPaths.join("', '")}'.`)
+  if (!conf.repositories || !Object.keys(conf.repositories).length) {
+    throw new Error(`No documentation repositories defined in any of '${confPaths.join("', '")}'.`)
   }
   conf.workDir = dir
   conf.buildDir = path.join(path.dirname(confPaths.pop()), 'build')
@@ -87,7 +87,7 @@ function readConfig(dir) {
   if (!fs.existsSync(conf.outDir)) {
     fs.mkdirSync(conf.outDir, { recursive: true })
   }
-  return conf
+  config = conf
 }
 
 /**
@@ -148,24 +148,24 @@ function saveJson(filePath, json) {
 /**
  * Create configuration for typescript.
  */
- function makeTsConfig() {
+function makeTsConfig() {
   let include = []
   Object.keys(config.repositories).forEach(name => {
     include = include.concat(config.repositories[name].include.map(i => `${name}/${i}`))
   })
-  const tsConf = {...TS_CONFIG, include}
+  const tsConf = { ...TS_CONFIG, include }
   saveJson('tsconfig.json', tsConf)
 }
 
 /**
  * Create configuration for typedoc.
  */
- function makeTypedocConfig() {
+function makeTypedocConfig() {
   let entryPoints = []
   Object.keys(config.repositories).forEach(name => {
     entryPoints = entryPoints.concat(config.repositories[name].include.map(i => `${name}/${i}`))
   })
-  const typedocConf = {...TYPEDOC_CONFIG, entryPoints, out: config.outDir}
+  const typedocConf = { ...TYPEDOC_CONFIG, entryPoints, out: config.outDir }
   const readmes = pathsFound(config.workDir, 'DOCCER-INDEX.md')
   if (readmes.length) {
     typedocConf.readme = readmes.pop()
@@ -208,6 +208,15 @@ async function buildAll() {
 }
 
 /**
+ * Launch the watch mode for documentation builder.
+ */
+async function watch() {
+  readConfig(process.cwd())
+  showConfig()
+  await system(`cd "${config.buildDir}" && npx typedoc --watch`)
+}
+
+/**
  * Main program.
  */
 async function main() {
@@ -215,11 +224,15 @@ async function main() {
   const parser = new ArgumentParser({
     description: 'Doccer CLI'
   })
-  parser.add_argument('operation', { choices: ['build-all'] })
+  parser.add_argument('operation', { choices: ['build-all', 'watch'] })
+
   const args = parser.parse_args()
+
   switch (args.operation) {
     case 'build-all':
       await buildAll()
+    case 'watch':
+      await watch()
   }
 }
 
