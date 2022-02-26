@@ -38,6 +38,7 @@ const TYPEDOC_CONFIG = {
   "entryPoints": [],
   "readme": null,
   "name": null,
+  "logLevel": "Verbose",
 }
 
 /**
@@ -231,8 +232,10 @@ async function main() {
   switch (args.operation) {
     case 'build-all':
       await buildAll()
+      break
     case 'watch':
       await watch()
+      break
   }
 }
 
