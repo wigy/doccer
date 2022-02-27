@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import path from 'path'
 import fs from 'fs'
+import glob from 'glob'
 import deepmerge from 'deepmerge'
 import { spawn } from 'child_process'
 import { ArgumentParser } from 'argparse'
@@ -147,25 +148,38 @@ function saveJson(filePath, json) {
 }
 
 /**
+ * Resolve entry points for a repository.
+ */
+function repoModules(name, repo) {
+  let result = []
+  for (const module of repo.modules) {
+    console.log(name, `${config.buildDir}/${name}/${module}`);
+    const matches = glob.sync(`${config.buildDir}/${name}/${module}`)
+    result = result.concat(matches.map(p => p.replace(`${config.buildDir}/`, '')))
+  }
+  return result
+}
+
+/**
  * Create configuration for typescript.
  */
-function makeTsConfig() {
-  let include = []
-  Object.keys(config.repositories).forEach(name => {
-    include = include.concat(config.repositories[name].include.map(i => `${name}/${i}`))
-  })
-  const tsConf = { ...TS_CONFIG, include }
+async function makeTsConfig() {
+  let modules = []
+  for (const [name, repo] of Object.entries(config.repositories)) {
+    modules = modules.concat(repoModules(name, repo))
+  }
+  const tsConf = { ...TS_CONFIG, include: modules }
   saveJson('tsconfig.json', tsConf)
 }
 
 /**
  * Create configuration for typedoc.
  */
-function makeTypedocConfig() {
+async function makeTypedocConfig() {
   let entryPoints = []
-  Object.keys(config.repositories).forEach(name => {
-    entryPoints = entryPoints.concat(config.repositories[name].include.map(i => `${name}/${i}`))
-  })
+  for (const [name, repo] of Object.entries(config.repositories)) {
+    entryPoints = entryPoints.concat(repoModules(name, repo))
+  }
   const typedocConf = { ...TYPEDOC_CONFIG, entryPoints, out: config.outDir }
   const readmes = pathsFound(config.workDir, 'DOCCER-INDEX.md')
   if (readmes.length) {
@@ -179,10 +193,6 @@ function makeTypedocConfig() {
  * Run document build command.
  */
 async function compile() {
-  let include = []
-  Object.keys(config.repositories).forEach(name => {
-    include = include.concat(config.repositories[name].include.map(i => `${name}/${i}`))
-  })
   await system(`cd "${config.buildDir}" && npx typedoc`)
 }
 
@@ -203,8 +213,8 @@ async function buildAll() {
   for (const name of Object.keys(config.repositories)) {
     await fetch(name)
   }
-  makeTsConfig()
-  makeTypedocConfig()
+  await makeTsConfig()
+  await makeTypedocConfig()
   await compile()
 }
 

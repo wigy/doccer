@@ -3,11 +3,11 @@
   "repositories": {
     "interactive-elements": {
       "git": "git@github.com:wigy/interactive-elements.git",
-      "include": ["src/index.ts"]
+      "modules": ["src/*.ts"]
     },
     "interactive-stateful-process": {
       "git": "git@github.com:wigy/interactive-stateful-process.git",
-      "include": ["src/index.ts"]
+      "modules": ["src/*.ts"]
     }
   }
 }
