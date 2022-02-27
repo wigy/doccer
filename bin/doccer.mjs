@@ -39,6 +39,7 @@ const TYPEDOC_CONFIG = {
   "readme": null,
   "name": null,
   "logLevel": "Verbose",
+  "includeVersion": true,
 }
 
 /**
