@@ -207,11 +207,13 @@ function showConfig() {
 /**
  * Rebuild documentation.
  */
-async function buildAll() {
+async function buildAll(args) {
   readConfig(process.cwd())
   showConfig()
-  for (const name of Object.keys(config.repositories)) {
-    await fetch(name)
+  if (!args.no_pull) {
+    for (const name of Object.keys(config.repositories)) {
+      await fetch(name)
+    }
   }
   await makeTsConfig()
   await makeTypedocConfig()
@@ -236,12 +238,13 @@ async function main() {
     description: 'Doccer CLI'
   })
   parser.add_argument('operation', { choices: ['build-all', 'watch'] })
+  parser.add_argument('--no-pull', { action: 'store_true', help: 'Skip git pull.' })
 
   const args = parser.parse_args()
 
   switch (args.operation) {
     case 'build-all':
-      await buildAll()
+      await buildAll(args)
       break
     case 'watch':
       await watch()
