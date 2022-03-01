@@ -3,11 +3,13 @@
   "repositories": {
     "interactive-elements": {
       "git": "git@github.com:wigy/interactive-elements.git",
-      "modules": ["src/*.ts", "src/*/index.ts"]
+      "modules": ["src/*.ts", "src/*/index.ts"],
+      "excludes": ["src/index.ts"]
     },
     "interactive-stateful-process": {
       "git": "git@github.com:wigy/interactive-stateful-process.git",
-      "modules": ["src/*.ts", "src/*/index.ts"]
+      "modules": ["src/*.ts", "src/*/index.ts"],
+      "excludes": ["src/index.ts"]
     }
   }
 }

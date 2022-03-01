@@ -157,6 +157,11 @@ function repoModules(name, repo) {
     const matches = glob.sync(`${config.buildDir}/${name}/${module}`)
     for (let match of matches) {
       match = match.replace(`${config.buildDir}/`, '')
+      const filePath = match.replace(`${name}/`, '')
+      if (repo.excludes && repo.excludes.includes(filePath)) {
+        log(`  [ ${match} SKIPPED ]`)
+        continue
+      }
       log(`  ${match}`)
       result.push(match)
     }
