@@ -153,9 +153,13 @@ function saveJson(filePath, json) {
 function repoModules(name, repo) {
   let result = []
   for (const module of repo.modules) {
-    console.log(name, `${config.buildDir}/${name}/${module}`);
+    log(`Adding ${config.buildDir}/${name}/${module}`);
     const matches = glob.sync(`${config.buildDir}/${name}/${module}`)
-    result = result.concat(matches.map(p => p.replace(`${config.buildDir}/`, '')))
+    for (let match of matches) {
+      match = match.replace(`${config.buildDir}/`, '')
+      log(`  ${match}`)
+      result.push(match)
+    }
   }
   return result
 }
