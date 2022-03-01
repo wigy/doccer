@@ -39,7 +39,7 @@ const TYPEDOC_CONFIG = {
   "entryPoints": [],
   "readme": null,
   "name": null,
-  "logLevel": "Verbose",
+  "logLevel": "Verbose"
 }
 
 /**
@@ -195,6 +195,7 @@ async function makeTypedocConfig() {
     typedocConf.readme = readmes.pop()
   }
   typedocConf.name = config.title || 'No Title'
+  typedocConf.json = path.join(config.buildDir, 'index.json')
   saveJson('typedoc.json', typedocConf)
 }
 
