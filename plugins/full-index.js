@@ -14,6 +14,11 @@ class IndexPlugin {
       if (comment) {
         for (const tag of comment.tags) {
           // Scan for tags.
+          if (tag.tagName === 'mytag') {
+            comment.text += '<br>Now got <i>Italic</i> and <b>Bold</b>.<br>' + tag.text
+            comment.tags = []
+            break
+          }
         }
       }
     }
