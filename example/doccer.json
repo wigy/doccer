@@ -1,14 +1,9 @@
 {
   "title": "Example Doccer Project",
   "repositories": {
-    "interactive-elements": {
-      "git": "git@github.com:wigy/interactive-elements.git",
-      "modules": ["src/*.ts", "src/*/index.ts"],
-      "excludes": ["src/index.ts"]
-    },
-    "interactive-stateful-process": {
-      "git": "git@github.com:wigy/interactive-stateful-process.git",
-      "modules": ["src/*.ts", "src/*/index.ts"],
+    "abacus-common": {
+      "git": "git@bitbucket.org:dataplug2/abacus-common.git",
+      "modules": ["src/*.ts"],
       "excludes": ["src/index.ts"]
     }
   }
