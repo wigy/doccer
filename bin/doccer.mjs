@@ -1,10 +1,13 @@
 #!/usr/bin/env node
-import path from 'path'
+import path, { dirname } from 'path'
 import fs from 'fs'
 import glob from 'glob'
 import deepmerge from 'deepmerge'
 import { spawn } from 'child_process'
 import { ArgumentParser } from 'argparse'
+import { fileURLToPath } from 'url'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // Currently used configuration.
 let config = {
@@ -182,6 +185,14 @@ async function makeTsConfig() {
 }
 
 /**
+ * Construct a list of plugins available.
+ */
+function plugins() {
+  const matches = glob.sync(path.join(__dirname, '..', 'plugins', '*.js'))
+  return matches
+}
+
+/**
  * Create configuration for typedoc.
  */
 async function makeTypedocConfig() {
@@ -196,6 +207,7 @@ async function makeTypedocConfig() {
   }
   typedocConf.name = config.title || 'No Title'
   typedocConf.json = path.join(config.buildDir, 'index.json')
+  typedocConf.plugin = plugins()
   saveJson('typedoc.json', typedocConf)
 }
 
