@@ -31,9 +31,13 @@ function nameOfKind(id) {
   }[id] || 'UNKNOWN'
 }
 
+const DEBUG_COMMENT = false
+const DEBUG_KEYS = false
+
 function dump(reflection, prefix='') {
-  console.log(prefix, `${nameOfKind(reflection.kind)}:`, reflection.name, '[', Object.keys(reflection).join(' '), ']');
-  if (reflection.comment) {
+  const keys = DEBUG_KEYS ? '[' + Object.keys(reflection).join(' ') + ']' : ''
+  console.log(prefix, `${nameOfKind(reflection.kind)}:`, reflection.name, keys);
+  if (DEBUG_COMMENT && reflection.comment) {
     Object.keys(reflection.comment).forEach(k => {
       console.log(prefix, '|', k, reflection.comment[k]);
     })
@@ -76,9 +80,16 @@ class IndexPlugin {
     })
   }
 
+  /**
+   * Generate full index.
+   */
   onConverterResolveBegin(context) {
+
     dump(context.project);
-    // Go through all reflections.
+    const index = this.index(context.project)
+    console.log(index);
+    // Go through all reflections and look for @fullindex.
+    // TODO: Maybe simply do it in readme?
     for (const reflection of context.project.getReflectionsByKind(ReflectionKind.All)) {
       const { comment } = reflection
       if (comment) {
@@ -92,6 +103,54 @@ class IndexPlugin {
         }
       }
     }
+  }
+
+  /**
+   * Construct a flat list of all refelections suitable for index.
+   */
+  index(project) {
+    const collect = (ref) => {
+      let ret = []
+      const kind = nameOfKind(ref.kind)
+      if (kind === 'UNKNOWN') {
+        throw new Error(`Canont recognize kind code ${ref.kind}.`)
+      }
+      switch(kind) {
+        case 'Enum':
+        case 'TypeAlias':
+        case 'Interface':
+        case 'Function':
+        case 'Variable':
+          ret.push({
+            name: ref.name,
+            kind,
+            parent: ref.parent.name
+          })
+          break
+        case 'EnumMember':
+        case 'Method':
+        case 'Property':
+        case 'Project':
+        case 'Module':
+            break
+        default:
+          throw new Error(`No handler for fill index for reflection of kind ${kind}.`)
+      }
+      if (ref.children) {
+        for (const c of ref.children) {
+          ret = ret.concat(collect(c))
+        }
+      }
+      return ret
+    }
+
+    const index = collect(project).sort((a, b) => {
+      a = a.name.toUpperCase()
+      b = b.name.toUpperCase()
+      return a === b ? 0 : (a < b ? -1 : 1)
+    })
+
+    console.log(index);
   }
 }
 
