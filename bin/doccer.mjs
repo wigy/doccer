@@ -190,7 +190,7 @@ async function makeTsConfig() {
 function plugins() {
   const local = glob.sync(path.join(__dirname, '..', 'plugins', '*.js'))
   const installed = ['typedoc-plugin-mermaid']
-  return matches.concat(installed)
+  return local.concat(installed)
 }
 
 /**
