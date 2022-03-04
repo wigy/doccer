@@ -102,7 +102,7 @@ function dump(reflection, prefix = '') {
       dump(child, prefix + '  ')
     }
   }
-  if (reflection.type) {
+  if (DEBUG_TYPES && sreflection.type) {
     // More details https://github.com/TypeStrong/typedoc/blob/master/src/lib/models/types.ts
     const { type, name } = reflection.type
     console.log(prefix, '  ', type, name || '');
@@ -123,20 +123,9 @@ class IndexPlugin {
 
     dump(context.project);
 
-    // Go through all reflections and look for @fullindex.
-    // TODO: Maybe simply do it in readme?
-    for (const reflection of context.project.getReflectionsByKind(ReflectionKind.All)) {
-      const { comment } = reflection
-      if (comment) {
-        for (const tag of comment.tags) {
-          // Scan for tags.
-          if (tag.tagName === 'fullindex') {
-            comment.text += this.html(context.project) + tag.text
-            comment.tags = []
-            break
-          }
-        }
-      }
+    if (context.project.readme.indexOf('{fullindex}') >= 0) {
+      const html = '\n\n' + this.html(context.project) + '\n\n'
+      context.project.readme = context.project.readme.replace('{fullindex}', html)
     }
   }
 
@@ -147,7 +136,8 @@ class IndexPlugin {
   html(project) {
     let html = `<section class="tsd-panel tsd-index-panel">
       <div class="tsd-index-content">
-      <section class="tsd-index-section "><h3>Full Index</h3><ul class="tsd-index-list">`
+      <section class="tsd-index-section ">
+      <ul class="tsd-index-list">`
 
     this.index(project).forEach(item => {
       const { name, kind, parent } = item
@@ -165,15 +155,16 @@ class IndexPlugin {
       }
 
       const url = dirOfKindName(kind) ?
-        `../${dirOfKindName(kind)}/${parent.replace(/[^\w]/g, '_')}.${name}.html` :
-        `${parent.replace(/[^\w]/g, '_')}.html#${name}`
+        `${dirOfKindName(kind)}/${parent.replace(/[^\w]/g, '_')}.${name}.html` :
+        `modules/${parent.replace(/[^\w]/g, '_')}.html#${name}`
 
       html += `<li class="${kindClass} tsd-parent-kind-module">
       <a href="${url}" class="tsd-kind-icon">${wbrName}</a>
       </li>`
     })
 
-    html += `</ul></section>
+    html += `</ul>
+      </section>
       </div>
       </section>`
 
