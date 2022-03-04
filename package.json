@@ -1,6 +1,6 @@
 {
   "name": "doccer",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "main": "bin/doccer.mjs",
   "repository": "git@github.com:wigy/doccer.git",
   "author": "Tommi Ronkainen <tommi.ronkainen@gmail.com>",
