@@ -1,5 +1,8 @@
 const { ReflectionKind, Converter } = require("typedoc")
 
+/**
+ * Get the name of the kind based on its ID.
+ */
 function nameOfKind(id) {
   // From https://github.com/TypeStrong/typedoc/blob/master/src/lib/models/reflections/kind.ts
   return {
@@ -28,9 +31,12 @@ function nameOfKind(id) {
     0x400000: 'TypeAlias',
     0x800000: 'Event',
     0x1000000: 'Reference',
-  }[id] || 'UNKNOWN'
+  }[id]
 }
 
+/**
+ * Get CSS class used for the kind.
+ */
 function classOfKindName(name) {
   return {
     'Project': 'tsd-kind-project',
@@ -58,7 +64,17 @@ function classOfKindName(name) {
     'TypeAlias': 'tsd-kind-type-alias',
     'Event': 'tsd-kind-event',
     'Reference': 'tsd-kind-reference',
-  }[name] || 'UNKNOWN'
+  }[name]
+}
+
+/**
+ * Get the name of the directory used for particular kind in URL.
+ */
+function dirOfKindName(name) {
+  return {
+    'Class': 'classes',
+    'Enum': 'enums'
+  }[name]
 }
 
 const DEBUG = false
@@ -141,12 +157,12 @@ class IndexPlugin {
       }
       const wbrName = parts.join('')
       const kindClass = classOfKindName(kind)
-      if (kind === 'UNKNOWN') {
+      if (kind === undefined) {
         throw new Error(`Cannot determine HTML class for kind '${kind}'.`)
       }
-      // TODO: Some types has still broken links.
-      const url = ['TypeAlias', 'Enum'].includes(kind) ?
-        `${parent.replace(/[^\w]/g, '_')}.${name}.html` :
+
+      const url = dirOfKindName(kind) ?
+        `../${dirOfKindName(kind)}/${parent.replace(/[^\w]/g, '_')}.${name}.html` :
         `${parent.replace(/[^\w]/g, '_')}.html#${name}`
 
       html += `<li class="${kindClass} tsd-parent-kind-module">
@@ -168,7 +184,7 @@ class IndexPlugin {
     const collect = (ref) => {
       let ret = []
       const kind = nameOfKind(ref.kind)
-      if (kind === 'UNKNOWN') {
+      if (kind === undefined) {
         throw new Error(`Canont recognize kind code ${ref.kind}.`)
       }
       switch (kind) {

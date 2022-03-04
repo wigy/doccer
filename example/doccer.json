@@ -5,6 +5,15 @@
       "git": "https://github.com/wigy/interactive-elements.git",
       "modules": ["src/*.ts", "src/*/index.ts"],
       "excludes": ["src/index.ts"]
+    },
+    "interactive-stateful-process": {
+      "git": "https://github.com/wigy/interactive-stateful-process.git",
+      "modules": ["src/*.ts", "src/*/index.ts"],
+      "excludes": ["src/index.ts", "src/testing/index.ts"]
+    },
+    "react-interactive-stateful-process": {
+      "git": "https://github.com/wigy/react-interactive-stateful-process.git",
+      "modules": ["src/doccer.ts", "src/*/index.ts"]
     }
   }
 }
