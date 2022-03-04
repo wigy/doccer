@@ -183,6 +183,7 @@ class IndexPlugin {
       }
       switch (kind) {
         case 'Enum':
+        case 'Event':
         case 'TypeAlias':
         case 'Interface':
         case 'Function':
@@ -195,17 +196,6 @@ class IndexPlugin {
             parent: ref.parent.name
           })
           break
-        // TODO: Once sure we got all useful, these can be deleted.
-        case 'Accessor':
-        case 'EnumMember':
-        case 'Method':
-        case 'Property':
-        case 'Project':
-        case 'Module':
-        case 'Constructor':
-          break
-        default:
-          throw new Error(`No handler for fill index for reflection '${ref.name}' of kind ${kind}.`)
       }
       if (ref.children) {
         for (const c of ref.children) {
