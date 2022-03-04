@@ -152,11 +152,14 @@ class IndexPlugin {
     this.index(project).forEach(item => {
       const { name, kind, parent } = item
       const parts = name.split(/([a-z])([A-Z])/)
+
       for (let i = 1; i < parts.length; i += 3) {
         parts[i] += '<wbr/>'
       }
+
       const wbrName = parts.join('')
       const kindClass = classOfKindName(kind)
+
       if (kind === undefined) {
         throw new Error(`Cannot determine HTML class for kind '${kind}'.`)
       }
