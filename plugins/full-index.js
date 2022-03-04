@@ -31,10 +31,19 @@ function nameOfKind(id) {
   }[id] || 'UNKNOWN'
 }
 
+const DEBUG = false
 const DEBUG_COMMENT = false
 const DEBUG_KEYS = false
+const DEBUG_TYPES = false
 
+/**
+ * Helper to study reflection data.
+ * @param reflection
+ * @param prefix
+ */
 function dump(reflection, prefix='') {
+  if (!DEBUG) return
+
   const keys = DEBUG_KEYS ? '[' + Object.keys(reflection).join(' ') + ']' : ''
   console.log(prefix, `${nameOfKind(reflection.kind)}:`, reflection.name, keys);
   if (DEBUG_COMMENT && reflection.comment) {
@@ -46,6 +55,11 @@ function dump(reflection, prefix='') {
     for (const child of reflection.children) {
       dump(child, prefix + '  ')
     }
+  }
+  if(reflection.type) {
+    // More details https://github.com/TypeStrong/typedoc/blob/master/src/lib/models/types.ts
+    const { type, name } = reflection.type
+    console.log(prefix, '  ', type, name || '');
   }
 }
 
@@ -121,12 +135,14 @@ class IndexPlugin {
         case 'Interface':
         case 'Function':
         case 'Variable':
+        case 'Class':
           ret.push({
             name: ref.name,
             kind,
             parent: ref.parent.name
           })
           break
+        // TODO: Once sure we got all useful, these can be deleted.
         case 'EnumMember':
         case 'Method':
         case 'Property':
@@ -150,7 +166,7 @@ class IndexPlugin {
       return a === b ? 0 : (a < b ? -1 : 1)
     })
 
-    console.log(index);
+    // console.log(index);
   }
 }
 
