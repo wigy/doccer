@@ -100,11 +100,9 @@ function readConfig(dir) {
  * @param command
  */
 async function system(command) {
-  log("Running:", command)
   return new Promise((resolve, reject) => {
     let out = ''
     const proc = spawn(command, { shell: true })
-
     proc.stdout.on('data', (data) => {
       out += data
       process.stdout.write(data)
@@ -116,7 +114,7 @@ async function system(command) {
 
     proc.on('close', (code) => {
       if (code) {
-        reject(new Error(`Failed with code ${code}.`))
+        reject(new Error(`Command '${command}' failed with code ${code}.`))
       } else {
         resolve(out)
       }
