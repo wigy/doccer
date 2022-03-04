@@ -31,6 +31,36 @@ function nameOfKind(id) {
   }[id] || 'UNKNOWN'
 }
 
+function classOfKindName(name) {
+  return {
+  'Project': 'tsd-kind-project',
+  'Module': 'tsd-kind-module',
+  'Namespace': 'tsd-kind-namespace',
+  'Enum': 'tsd-kind-enum',
+  'EnumMember': 'tsd-kind-enum-member',
+  'Variable': 'tsd-kind-variable',
+  'Function': 'tsd-kind-function',
+  'Class': 'tsd-kind-class',
+  'Interface': 'tsd-kind-interface',
+  'Constructor': 'tsd-kind-constructor',
+  'Property': 'tsd-kind-property',
+  'Method': 'tsd-kind-method',
+  'CallSignature': 'tsd-kind-call-signature',
+  'IndexSignature': 'tsd-kind-index-signature',
+  'ConstructorSignature': 'tsd-kind-constructors-ignature',
+  'Parameter': 'tsd-kind-parameter',
+  'TypeLiteral': 'tsd-kind-type-literal',
+  'TypeParameter': 'tsd-kind-type-parameter',
+  'Accessor': 'tsd-kind-accessor',
+  'GetSignature': 'tsd-kind-get-signature',
+  'SetSignature': 'tsd-kind-set-signature',
+  'ObjectLiteral': 'tsd-kind-object-literal',
+  'TypeAlias': 'tsd-kind-type-alias',
+  'Event': 'tsd-kind-event',
+  'Reference': 'tsd-kind-reference',
+  }[name] || 'UNKNOWN'
+}
+
 const DEBUG = false
 const DEBUG_COMMENT = false
 const DEBUG_KEYS = false
@@ -63,30 +93,6 @@ function dump(reflection, prefix='') {
   }
 }
 
-function html() {
-
-  return `
-  <section class="tsd-panel tsd-index-panel">
-  <div class="tsd-index-content">
-  <section class="tsd-index-section "><h3>Full Index</h3><ul class="tsd-index-list">
-  <li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="interactive_elements_src_api_types.html#GetAllProcessesApiResponse" class="tsd-kind-icon">Get<wbr>All<wbr>Processes<wbr>Api<wbr>Response</a></li>
-  <li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="interactive_elements_src_api_types.html#GetOneProcessResponse" class="tsd-kind-icon">Get<wbr>One<wbr>Process<wbr>Response</a></li>
-  <li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="interactive_elements_src_api_types.html#GetOneStepResponse" class="tsd-kind-icon">Get<wbr>One<wbr>Step<wbr>Response</a></li>
-  <li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="interactive_elements_src_api_types.html#ID" class="tsd-kind-icon">ID</a></li>
-  <li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="interactive_elements_src_api_types.html#RealID" class="tsd-kind-icon">RealID</a></li>
-  <li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="interactive_elements_src_api_types.html#GetAllProcessesApiResponse" class="tsd-kind-icon">Get<wbr>All<wbr>Processes<wbr>Api<wbr>Response</a></li>
-  <li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="interactive_elements_src_api_types.html#GetOneProcessResponse" class="tsd-kind-icon">Get<wbr>One<wbr>Process<wbr>Response</a></li>
-  <li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="interactive_elements_src_api_types.html#GetOneStepResponse" class="tsd-kind-icon">Get<wbr>One<wbr>Step<wbr>Response</a></li>
-  <li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="interactive_elements_src_api_types.html#ID" class="tsd-kind-icon">ID</a></li>
-  <li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="interactive_elements_src_api_types.html#RealID" class="tsd-kind-icon">RealID</a></li>
-  </ul></section>
-  </div>
-  </section>
-  `
-
-}
-
-
 class IndexPlugin {
   constructor(app) {
     app.converter.on(Converter.EVENT_RESOLVE_BEGIN, (context) => {
@@ -100,8 +106,7 @@ class IndexPlugin {
   onConverterResolveBegin(context) {
 
     dump(context.project);
-    const index = this.index(context.project)
-    console.log(index);
+
     // Go through all reflections and look for @fullindex.
     // TODO: Maybe simply do it in readme?
     for (const reflection of context.project.getReflectionsByKind(ReflectionKind.All)) {
@@ -110,13 +115,50 @@ class IndexPlugin {
         for (const tag of comment.tags) {
           // Scan for tags.
           if (tag.tagName === 'fullindex') {
-            comment.text += html(context.project) + tag.text
+            comment.text += this.html(context.project) + tag.text
             comment.tags = []
             break
           }
         }
       }
     }
+  }
+
+  /**
+   * Create index.
+   * @param project
+   */
+  html(project) {
+    let html = `<section class="tsd-panel tsd-index-panel">
+      <div class="tsd-index-content">
+      <section class="tsd-index-section "><h3>Full Index</h3><ul class="tsd-index-list">`
+
+    this.index(project).forEach(item => {
+      const { name, kind, parent } = item
+      const parts = name.split(/([a-z])([A-Z])/)
+      for ( let i = 1; i < parts.length; i+=3) {
+        parts[i] += '<wbr/>'
+      }
+      const wbrName = parts.join('')
+      const kindClass = classOfKindName(kind)
+      if (kind === 'UNKNOWN') {
+        throw new Error(`Cannot determine HTML class for kind '${kind}'.`)
+      }
+      // TODO: Some types has still broken links.
+      const url = ['TypeAlias', 'Enum'].includes(kind) ?
+        `${parent.replace(/[^\w]/g, '_')}.${name}.html` :
+        `${parent.replace(/[^\w]/g, '_')}.html#${name}`
+
+      html += `<li class="${kindClass} tsd-parent-kind-module">
+      <a href="${url}" class="tsd-kind-icon">${wbrName}</a>
+      </li>`
+    })
+
+    html += `</ul></section>
+      </div>
+      </section>`
+
+    return html
   }
 
   /**
@@ -166,7 +208,7 @@ class IndexPlugin {
       return a === b ? 0 : (a < b ? -1 : 1)
     })
 
-    // console.log(index);
+    return index
   }
 }
 
