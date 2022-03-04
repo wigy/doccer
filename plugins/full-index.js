@@ -123,7 +123,7 @@ class IndexPlugin {
 
     dump(context.project);
 
-    if (context.project.readme.indexOf('{fullindex}') >= 0) {
+    if (context.project.readme && context.project.readme.indexOf('{fullindex}') >= 0) {
       const html = '\n\n' + this.html(context.project) + '\n\n'
       context.project.readme = context.project.readme.replace('{fullindex}', html)
     }
