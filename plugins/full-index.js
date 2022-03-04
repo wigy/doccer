@@ -33,31 +33,31 @@ function nameOfKind(id) {
 
 function classOfKindName(name) {
   return {
-  'Project': 'tsd-kind-project',
-  'Module': 'tsd-kind-module',
-  'Namespace': 'tsd-kind-namespace',
-  'Enum': 'tsd-kind-enum',
-  'EnumMember': 'tsd-kind-enum-member',
-  'Variable': 'tsd-kind-variable',
-  'Function': 'tsd-kind-function',
-  'Class': 'tsd-kind-class',
-  'Interface': 'tsd-kind-interface',
-  'Constructor': 'tsd-kind-constructor',
-  'Property': 'tsd-kind-property',
-  'Method': 'tsd-kind-method',
-  'CallSignature': 'tsd-kind-call-signature',
-  'IndexSignature': 'tsd-kind-index-signature',
-  'ConstructorSignature': 'tsd-kind-constructors-ignature',
-  'Parameter': 'tsd-kind-parameter',
-  'TypeLiteral': 'tsd-kind-type-literal',
-  'TypeParameter': 'tsd-kind-type-parameter',
-  'Accessor': 'tsd-kind-accessor',
-  'GetSignature': 'tsd-kind-get-signature',
-  'SetSignature': 'tsd-kind-set-signature',
-  'ObjectLiteral': 'tsd-kind-object-literal',
-  'TypeAlias': 'tsd-kind-type-alias',
-  'Event': 'tsd-kind-event',
-  'Reference': 'tsd-kind-reference',
+    'Project': 'tsd-kind-project',
+    'Module': 'tsd-kind-module',
+    'Namespace': 'tsd-kind-namespace',
+    'Enum': 'tsd-kind-enum',
+    'EnumMember': 'tsd-kind-enum-member',
+    'Variable': 'tsd-kind-variable',
+    'Function': 'tsd-kind-function',
+    'Class': 'tsd-kind-class',
+    'Interface': 'tsd-kind-interface',
+    'Constructor': 'tsd-kind-constructor',
+    'Property': 'tsd-kind-property',
+    'Method': 'tsd-kind-method',
+    'CallSignature': 'tsd-kind-call-signature',
+    'IndexSignature': 'tsd-kind-index-signature',
+    'ConstructorSignature': 'tsd-kind-constructors-ignature',
+    'Parameter': 'tsd-kind-parameter',
+    'TypeLiteral': 'tsd-kind-type-literal',
+    'TypeParameter': 'tsd-kind-type-parameter',
+    'Accessor': 'tsd-kind-accessor',
+    'GetSignature': 'tsd-kind-get-signature',
+    'SetSignature': 'tsd-kind-set-signature',
+    'ObjectLiteral': 'tsd-kind-object-literal',
+    'TypeAlias': 'tsd-kind-type-alias',
+    'Event': 'tsd-kind-event',
+    'Reference': 'tsd-kind-reference',
   }[name] || 'UNKNOWN'
 }
 
@@ -71,7 +71,7 @@ const DEBUG_TYPES = false
  * @param reflection
  * @param prefix
  */
-function dump(reflection, prefix='') {
+function dump(reflection, prefix = '') {
   if (!DEBUG) return
 
   const keys = DEBUG_KEYS ? '[' + Object.keys(reflection).join(' ') + ']' : ''
@@ -86,7 +86,7 @@ function dump(reflection, prefix='') {
       dump(child, prefix + '  ')
     }
   }
-  if(reflection.type) {
+  if (reflection.type) {
     // More details https://github.com/TypeStrong/typedoc/blob/master/src/lib/models/types.ts
     const { type, name } = reflection.type
     console.log(prefix, '  ', type, name || '');
@@ -136,7 +136,7 @@ class IndexPlugin {
     this.index(project).forEach(item => {
       const { name, kind, parent } = item
       const parts = name.split(/([a-z])([A-Z])/)
-      for ( let i = 1; i < parts.length; i+=3) {
+      for (let i = 1; i < parts.length; i += 3) {
         parts[i] += '<wbr/>'
       }
       const wbrName = parts.join('')
@@ -171,13 +171,14 @@ class IndexPlugin {
       if (kind === 'UNKNOWN') {
         throw new Error(`Canont recognize kind code ${ref.kind}.`)
       }
-      switch(kind) {
+      switch (kind) {
         case 'Enum':
         case 'TypeAlias':
         case 'Interface':
         case 'Function':
         case 'Variable':
         case 'Class':
+        case 'Namespace':
           ret.push({
             name: ref.name,
             kind,
@@ -185,14 +186,16 @@ class IndexPlugin {
           })
           break
         // TODO: Once sure we got all useful, these can be deleted.
+        case 'Accessor':
         case 'EnumMember':
         case 'Method':
         case 'Property':
         case 'Project':
         case 'Module':
-            break
+        case 'Constructor':
+          break
         default:
-          throw new Error(`No handler for fill index for reflection of kind ${kind}.`)
+          throw new Error(`No handler for fill index for reflection '${ref.name}' of kind ${kind}.`)
       }
       if (ref.children) {
         for (const c of ref.children) {
