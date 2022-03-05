@@ -139,6 +139,8 @@ class IndexPlugin {
       <section class="tsd-index-section ">
       <ul class="tsd-index-list">`
 
+    let count = 0
+
     this.index(project).forEach(item => {
       const { name, kind, parent } = item
       const parts = name.split(/([a-z_])([A-Z])/)
@@ -161,8 +163,11 @@ class IndexPlugin {
       html += `<li class="${kindClass} tsd-parent-kind-module">
       <a href="${url}" class="tsd-kind-icon">${wbrName}</a>
       </li>`
+      count++
     })
 
+    html += `<li>&nbsp;</li>`
+    html += `<li>Total: ${count}</li>`
     html += `</ul>
       </section>
       </div>

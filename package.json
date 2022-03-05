@@ -10,7 +10,8 @@
   },
   "scripts": {
     "demo": "cd example && doccer build-all",
-    "demo:watch": "cd example && doccer watch"
+    "demo:watch": "cd example && doccer watch",
+    "demo:commit": "cd example && doccer commit"
   },
   "dependencies": {
     "@mui/material": "^5.4.4",
