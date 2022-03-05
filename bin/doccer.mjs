@@ -250,6 +250,16 @@ async function watch() {
   await system(`cd "${config.buildDir}" && npx typedoc --watch`)
 }
 
+async function commit() {
+  readConfig(process.cwd())
+  for (const repo of Object.keys(config.repositories)) {
+    const status = await system(`cd ${config.buildDir}/${repo} && git status --porcelain`)
+    if (status.trim() !== '') {
+      await system(`cd ${config.buildDir}/${repo} && git commit -a -m "Update documentation."`)
+    }
+  }
+}
+
 /**
  * Main program.
  */
@@ -258,7 +268,7 @@ async function main() {
   const parser = new ArgumentParser({
     description: 'Doccer CLI'
   })
-  parser.add_argument('operation', { choices: ['build-all', 'watch'] })
+  parser.add_argument('operation', { choices: ['build-all', 'watch', 'commit'] })
   parser.add_argument('--no-pull', { action: 'store_true', help: 'Skip git pull.' })
 
   const args = parser.parse_args()
@@ -269,6 +279,9 @@ async function main() {
       break
     case 'watch':
       await watch()
+      break
+    case 'commit':
+      await commit()
       break
   }
 }
