@@ -13,9 +13,14 @@
     "demo:watch": "cd example && doccer watch"
   },
   "dependencies": {
+    "@mui/material": "^5.4.4",
     "argparse": "^2.0.1",
     "deepmerge": "^4.2.2",
     "glob": "^7.2.0",
+    "mobx": "^6.4.2",
+    "mobx-react": "^7.3.0",
+    "react": "^17.0.2",
+    "react-i18next": "^11.15.5",
     "typedoc": "^0.22.12",
     "typedoc-plugin-mermaid": "^1.6.0",
     "typescript": "^4.5.5"
