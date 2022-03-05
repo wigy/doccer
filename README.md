@@ -35,6 +35,8 @@ Then running `doccer build-all` generates complete documentation for the project
 
 Run `yarn demo` and check out the file `example/build/html/index.html`.
 
+To create live server, you can run `docker-compose up`. It is viewable at http://localhost:3303/
+
 ## Plugins
 
 ### Full index

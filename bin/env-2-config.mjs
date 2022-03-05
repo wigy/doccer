@@ -22,7 +22,7 @@ if (process.argv.length < 3) {
     const name = repo.split('/').pop().replace(/\.git$/, '')
     config.repositories[name] = {
       git: repo,
-      include: ['src/index.ts'] // TODO: Find out during the build time form package.json.
+      modules: ['src/index.ts']
     }
   })
   fs.writeFileSync(process.argv[2], JSON.stringify(config, null, 2) + '\n')
