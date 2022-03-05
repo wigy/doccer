@@ -3,7 +3,7 @@ Toos for bundling one or more Typescript project documentation into single runab
 
 ## Usage
 
-Define a configuration `doccer.json` having title of the project and repositories. It should
+Define a configuration `doccer.json` having the title of the project and repositories. It should
 define entry points for modules.
 ```json
 {
@@ -30,6 +30,10 @@ define entry points for modules.
 Also one can create project top level index using markdown file `DOCCER-INDEX.md`.
 
 Then running `doccer build-all` generates complete documentation for the project.
+
+## Example
+
+Run `yarn demo` and check out the file `example/build/html/index.html`.
 
 ## Plugins
 
