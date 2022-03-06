@@ -255,7 +255,7 @@ async function commit() {
   for (const repo of Object.keys(config.repositories)) {
     const status = await system(`cd ${config.buildDir}/${repo} && git status --porcelain`)
     if (status.trim() !== '') {
-      await system(`cd ${config.buildDir}/${repo} && git commit -a -m "Update documentation." && git push`)
+      await system(`cd ${config.buildDir}/${repo} && git pull --no-edit && git commit -a -m "Update documentation." && git push`)
     }
   }
 }
