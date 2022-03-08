@@ -134,6 +134,7 @@ async function fetch(name) {
   } else {
     await system(`cd "${config.buildDir}" && git clone "${config.repositories[name].git}"`)
   }
+  log(`Running yarn install in ${config.buildDir}`)
   await system(`cd "${config.buildDir}/${name}" && yarn install`)
 }
 
