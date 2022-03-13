@@ -271,6 +271,10 @@ async function clean() {
   readConfig(process.cwd())
   for (const repo of Object.keys(config.repositories)) {
     if (fs.existsSync(`${config.buildDir}/${repo}`)) {
+      const status = await system(`cd ${config.buildDir}/${repo} && git status --porcelain`)
+      if (status.trim() !== '') {
+        throw new Error(`There are uncommited changes in ${config.buildDir}/${repo} - refusing to remove.`)
+      }
       log(`Deleting ${config.buildDir}/${repo}`)
       await system(`rm -fr ${config.buildDir}/${repo}`)
     }
