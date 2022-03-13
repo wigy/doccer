@@ -251,12 +251,28 @@ async function watch() {
   await system(`cd "${config.buildDir}" && npx typedoc --watch`)
 }
 
+/**
+ * Commit changes in document repos.
+ */
 async function commit() {
   readConfig(process.cwd())
   for (const repo of Object.keys(config.repositories)) {
     const status = await system(`cd ${config.buildDir}/${repo} && git status --porcelain`)
     if (status.trim() !== '') {
       await system(`cd ${config.buildDir}/${repo} && git pull --no-edit && git commit -a -m "Update documentation." && git push`)
+    }
+  }
+}
+
+/**
+ * Delete document repos.
+ */
+async function clean() {
+  readConfig(process.cwd())
+  for (const repo of Object.keys(config.repositories)) {
+    if (fs.existsSync(`${config.buildDir}/${repo}`)) {
+      log(`Deleting ${config.buildDir}/${repo}`)
+      await system(`rm -fr ${config.buildDir}/${repo}`)
     }
   }
 }
@@ -269,7 +285,7 @@ async function main() {
   const parser = new ArgumentParser({
     description: 'Doccer CLI'
   })
-  parser.add_argument('operation', { choices: ['build-all', 'watch', 'commit'] })
+  parser.add_argument('operation', { choices: ['build-all', 'watch', 'commit', 'clean'] })
   parser.add_argument('--no-pull', { action: 'store_true', help: 'Skip git pull.' })
 
   const args = parser.parse_args()
@@ -283,6 +299,9 @@ async function main() {
       break
     case 'commit':
       await commit()
+      break
+    case 'clean':
+      await clean()
       break
   }
 }
