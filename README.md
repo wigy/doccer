@@ -1,6 +1,8 @@
 # doccer
 Toos for bundling one or more Typescript project documentation into single runable viewing service.
 
+NOTE: This has been continued as a part of https://github.com/dataplugoy/tasenor-bookkeeper
+
 ## Usage
 
 Define a configuration `doccer.json` having the title of the project and repositories. It should
